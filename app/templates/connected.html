@@ -1,0 +1,73 @@
+{% load static %}
+<html>
+<head>
+    <title>OAuth2 Sample App - Intuit</title>
+    <link rel="stylesheet" type="text/css" href="{% static "style.css" %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script>
+        // Builds the HTML Table out of myList.
+        function buildHtmlTable(myList, selector) {
+            const columns = addAllColumnHeaders(myList, selector);
+
+            for (let i = 0; i < myList.length; i++) {
+                let row$ = $('<tr/>');
+                for (let colIndex = 0; colIndex < columns.length; colIndex++) {
+                    let cellValue = myList[i][columns[colIndex]];
+                    if (cellValue == null) cellValue = "";
+                    row$.append($('<td/>').html(cellValue));
+                }
+                $(selector).append(row$);
+            }
+        }
+
+        // Adds a header row to the table and returns the set of columns.
+        // Need to do union of keys from all records as some records may not contain
+        // all records.
+        function addAllColumnHeaders(myList, selector) {
+            const columnSet = [];
+            let headerTr$ = $('<tr/>');
+
+            for (let i = 0; i < myList.length; i++) {
+                const rowHash = myList[i];
+                for (let key in rowHash) {
+                    if ($.inArray(key, columnSet) == -1) {
+                        columnSet.push(key);
+                        headerTr$.append($('<th/>').html(key));
+                    }
+                }
+            }
+            $(selector).append(headerTr$);
+
+            return columnSet;
+        }
+        function apiCall() {
+            $("#result").html('Loading...');
+            $.get("/app/account", function (data) {
+                const account = data["Account"];
+                buildHtmlTable(account, "#accounts");
+            })
+        }
+
+        function refreshCall() {
+            $("#result").html('Loading...');
+            $.get("/app/refresh", function (data) {
+                $("#result").html(data)
+            })
+        }
+    </script>
+</head>
+<body>
+<a href="/app/">Home</a>
+<h3>Connected!</h3>
+<div>
+    <button onclick="apiCall()">Fetch Accounts</button>
+    <button onclick="refreshCall()">Refresh Token Call</button>
+
+    <br><br>
+    <table id="accounts">
+
+    </table>
+    <div><code id="result"></code></div>
+</div>
+</body>
+</html>
