@@ -10,6 +10,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServer
 from django.conf import settings
 
 from app.services import get_account_info
+from quickbooks import QuickBooks
 
 
 # Create your views here.
@@ -99,7 +100,15 @@ def account(request):
         refresh_token=request.session.get('refresh_token', None),
         realm_id=request.session.get('realm_id', None),
     )
+    client = QuickBooks(
+        auth_client=auth_client,
+        refresh_token=request.session.get('refresh_token', None),
+        company_id=4620816365030839390,
+    )
 
+    from quickbooks.objects.account import Account
+    accounts = Account.all(qb=client)
+    print(accounts)
     if auth_client.access_token is not None:
         access_token = auth_client.access_token
 
