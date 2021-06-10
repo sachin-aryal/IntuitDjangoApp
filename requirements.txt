@@ -1,4 +1,4 @@
 intuit_oauth==1.1.1
-Django==2.1.2
+Django==2.2.24
 requests==2.19.1
 python-quickbooks==0.8.1
